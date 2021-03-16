@@ -24,6 +24,12 @@ python manage.py runserver
 python manage.py createsuperuser
 ```
 
+Install dependencies
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
 
 1- (Once by app) Créer l'application
 ```bash
