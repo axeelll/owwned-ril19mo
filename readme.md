@@ -24,7 +24,7 @@ python manage.py runserver
 1- (Once by app) Créer l'application
 ```bash
 mkdir apps/organization
-python manage.py startapp 
+python manage.py startapp organization apps/organization
 ```
 
 2- Ajouter l'application au fichier project/settings.py
