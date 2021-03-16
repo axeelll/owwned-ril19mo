@@ -27,7 +27,7 @@ class Query(graphene.ObjectType):
     rooms = graphene.List(RoomType)
 
     def resolve_buildings(self, info, **kwargs):
-        return Location.objects.all()
+        return Building.objects.all()
 
     def resolve_floors(self, info, **kwargs):
         return Floor.objects.all()
