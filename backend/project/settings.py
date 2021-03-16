@@ -32,6 +32,8 @@ INSTALLED_APPS = [
     'apps.organization',
     'apps.team',
     'apps.asset',
+    'apps.history_event',
+    'apps.user_profile',
     'graphene_django',
     'django.contrib.admin',
     'django.contrib.auth',
