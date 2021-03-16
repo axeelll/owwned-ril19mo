@@ -16,14 +16,10 @@ pip install django
 Start Django Server (from backend):
 ```bash
 cd backend
+pip install -r requirements.txt
 python manage.py runserver
 ```
 
-Install dependencies
-```bash
-cd backend
-pip install -r requirements.txt
-```
 
 1- (Once by app) Créer l'application
 ```bash
