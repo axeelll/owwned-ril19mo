@@ -19,17 +19,11 @@ cd backend
 python manage.py runserver
 ```
 
-(Once) Create Super User
-```bash
-python manage.py createsuperuser
-```
-
 Install dependencies
 ```bash
 cd backend
 pip install -r requirements.txt
 ```
-
 
 1- (Once by app) Créer l'application
 ```bash
@@ -44,4 +38,9 @@ python manage.py startapp
 ```bash
 python manage.py makemigrations
 python manage.py migrate
+```
+
+(Once per project) Create Super User
+```bash
+python manage.py createsuperuser
 ```
