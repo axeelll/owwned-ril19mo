@@ -53,9 +53,8 @@ class Query(graphene.ObjectType):
     def resolve_rooms(self, info, **kwargs):
         return Room.objects.all()
 
-# MUTATIONS
 
-
+# MUTATIONS BUILDING
 # CREATE
 class CreateBuildingMutation(graphene.Mutation):
     class Arguments:
@@ -94,7 +93,7 @@ class UpdateBuildingMutation(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, id, lat, lng, address, name):
-        building = Organization.objects.get(pk=id)
+        building = Building.objects.get(pk=id)
         building.lat = lat
         building.lng = lng
         building.address = address
@@ -127,8 +126,77 @@ class DeleteBuildingMutation(graphene.Mutation):
         return DeleteBuildingMutation(deleted=deleted)
 
 
+# MUTATIONS FLOOR
+# CREATE
+class CreateFloorMutation(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        name = graphene.String(required=True, max_length=255)
+        number = graphene.Int(required=True)
+        batiment_id = graphene.Int(name="batiment")
+
+    # The class attributes define the response of the mutation
+    floor = graphene.Field(FloorType)
+
+    @classmethod
+    def mutate(cls, root, info, name, number, batiment_id):
+        floor = Floor.objects.create(name=name, number=number, batiment_id=batiment_id)
+
+        # Notice we return an instance of this mutation
+        return CreateFloorMutation(floor=floor)
+
+
+# UPDATE
+class UpdateFloorMutation(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.ID()
+        name = graphene.String(required=True)
+        batiment = graphene.ID(Building.pk)
+
+    # The class attributes define the response of the mutation
+    floor = graphene.Field(FloorType)
+
+    @classmethod
+    def mutate(cls, root, info, id, name, number, batiment_id):
+        floor = Floor.objects.get(pk=id)
+        floor.name = name
+        floor.number = number
+        floor.batiment_id = batiment_id
+
+        floor.save()
+
+        # Notice we return an instance of this mutation
+        return UpdateFloorMutation(floor=floor)
+
+
+# DELETE
+class DeleteFloorMutation(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.ID()
+
+    # The class attributes define the response of the mutation
+    deleted = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, id):
+        deleted = True
+        try:
+            floor = Floor.objects.get(pk=id)
+            floor.delete()
+        except Floor.DoesNotExist:
+            deleted = False
+
+        # Notice we return an instance of this mutation
+        return DeleteFloorMutation(deleted=deleted)
+
+
 # MUTATIONS
 class Mutation(graphene.ObjectType):
+    create_floor = CreateFloorMutation.Field()
+    update_floor = UpdateFloorMutation.Field()
+    delete_floor = DeleteFloorMutation.Field()
     create_building = CreateBuildingMutation.Field()
     update_building = UpdateBuildingMutation.Field()
     delete_building = DeleteBuildingMutation.Field()
