@@ -30,6 +30,8 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'apps.organization',
+    'apps.supplier',
+    'apps.documentation',
     'apps.team',
     'apps.asset',
     'apps.history_event',
