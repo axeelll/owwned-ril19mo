@@ -29,9 +29,13 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'apps.location',
     'apps.organization',
+    'apps.location',
+    'apps.supplier',
+    'apps.documentation',
     'apps.team',
+    'apps.history_event',
+    'apps.user_profile',
     'apps.asset',
     'django_filters',
     'graphene_django',
