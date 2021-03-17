@@ -12,7 +12,8 @@ class Building(models.Model):
 
 
 class Floor(models.Model):
-    batiment = models.ForeignKey(Building, on_delete=models.CASCADE)
+    batiment = models.ForeignKey(
+        Building, related_name="floors", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     number = models.IntegerField()
 
@@ -21,7 +22,8 @@ class Floor(models.Model):
 
 
 class Room(models.Model):
-    floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
+    floor = models.ForeignKey(
+        Floor, related_name="rooms", on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
     def __str__(self):
