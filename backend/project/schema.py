@@ -12,4 +12,8 @@ class Query(history_event_schema.Query, asset_schema.Query, team_schema.Query, s
     pass
 
 
-schema = graphene.Schema(query=Query)
+class Mutation(organization_schema.Mutation, graphene.ObjectType):
+    pass
+
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
