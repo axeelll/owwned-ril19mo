@@ -138,15 +138,16 @@ class CreateFloorMutation(graphene.Mutation):
         # The input arguments for this mutation
         name = graphene.String(required=True)
         number = graphene.Int(required=True)
-        batiment_id = graphene.Int(name="batiment")
+        batiment_id = graphene.GlobalID(required=False, name="batiment")
 
     # The class attributes define the response of the mutation
     floor = graphene.Field(FloorType)
 
     @classmethod
     def mutate(cls, root, info, name, number, batiment_id):
+        node_type, batiment_pk = from_global_id(batiment_id)
         floor = Floor.objects.create(
-            name=name, number=number, batiment_id=batiment_id)
+            name=name, number=number, batiment_id=batiment_pk)
 
         # Notice we return an instance of this mutation
         return CreateFloorMutation(floor=floor)
@@ -157,18 +158,25 @@ class UpdateFloorMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
         id = graphene.ID()
-        name = graphene.String(required=True)
-        batiment = graphene.Int(name="floor")
+        name = graphene.String(required=False)
+        number = graphene.Int(required=False)
+        batiment = graphene.GlobalID(required=False, name="floor")
 
     # The class attributes define the response of the mutation
     floor = graphene.Field(FloorType)
 
     @classmethod
-    def mutate(cls, root, info, id, name, number, batiment_id):
+    def mutate(cls, root, info, id, name=None, number=None, batiment_id=None):
+        batiment_pk = None
+        if batiment_id is not None:
+            node_type, batiment_pk = from_global_id(batiment_id)
         floor = Floor.objects.get(pk=id)
-        floor.name = name
-        floor.number = number
-        floor.batiment_id = batiment_id
+        if name is not None:
+            floor.name = name
+        if number is not None:
+            floor.number = number
+        if batiment_pk is not None:
+            floor.batiment_id = batiment_pk
 
         floor.save()
 
@@ -204,14 +212,15 @@ class CreateRoomMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
         name = graphene.String(required=True)
-        floor_id = graphene.Int(name="floor")
+        floor_id = graphene.GlobalID(name="floor")
 
     # The class attributes define the response of the mutation
     room = graphene.Field(RoomType)
 
     @classmethod
     def mutate(cls, root, info, name, floor_id):
-        room = Floor.objects.create(name=name, floor_id=floor_id)
+        node_type, floor_pk = from_global_id(floor_id)
+        room = Floor.objects.create(name=name, floor_id=floor_pk)
 
         # Notice we return an instance of this mutation
         return CreateFloorMutation(room=room)
@@ -229,10 +238,15 @@ class UpdateRoomMutation(graphene.Mutation):
     room = graphene.Field(RoomType)
 
     @classmethod
-    def mutate(cls, root, info, id, name, number, floor_id):
+    def mutate(cls, root, info, id, name=None, floor_id=None):
+        floor_pk = None
+        if floor_id is not None:
+            node_type, floor_pk = from_global_id(floor_id)
         room = Room.objects.get(pk=id)
-        room.name = name
-        room.floor_id = floor_id
+        if name is not None:
+            room.name = name
+        if floor_id is not None:
+            room.floor_id = floor_pk
 
         room.save()
 
