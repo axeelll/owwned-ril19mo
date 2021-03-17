@@ -35,11 +35,7 @@ class RoomBType(DjangoObjectType):
 
 
 class Query(graphene.ObjectType):
-    buildings = graphene.List(BuildingType)
-    floors = graphene.List(FloorType)
-    rooms = graphene.List(RoomBType)
-
-    filtRooms = DjangoFilterConnectionField(RoomType)
+    rooms = DjangoFilterConnectionField(RoomType)
     room = Node.Field(RoomType)
 
     floors = DjangoFilterConnectionField(FloorType)
@@ -56,3 +52,83 @@ class Query(graphene.ObjectType):
 
     def resolve_rooms(self, info, **kwargs):
         return Room.objects.all()
+
+# MUTATIONS
+
+
+# CREATE
+class CreateBuildingMutation(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        lat = graphene.Decimal(required=True)
+        lng = graphene.Decimal(required=True)
+        address = graphene.String(required=True)
+        name = graphene.String(required=True)
+
+    # The class attributes define the response of the mutation
+    building = graphene.Field(BuildingType)
+
+    @classmethod
+    def mutate(cls, root, info, lat, lng, address, name):
+        building = Building.objects.create(lat=lat)
+        building = Building.objects.create(lng=lng)
+        building = Building.objects.create(address=address)
+        building = Building.objects.create(name=name)
+
+        # Notice we return an instance of this mutation
+        return CreateBuildingMutation(building=building)
+
+
+# UPDATE
+class UpdateBuildingMutation(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.ID()
+        lat = graphene.Decimal(required=True)
+        lng = graphene.Decimal(required=True)
+        address = graphene.String(required=True)
+        name = graphene.String(required=True)
+
+    # The class attributes define the response of the mutation
+    building = graphene.Field(BuildingType)
+
+    @classmethod
+    def mutate(cls, root, info, id, lat, lng, address, name):
+        building = Organization.objects.get(pk=id)
+        building.lat = lat
+        building.lng = lng
+        building.address = address
+        building.name = name
+        building.save()
+
+        # Notice we return an instance of this mutation
+        return UpdateBuildingMutation(building=building)
+
+
+# DELETE
+class DeleteBuildingMutation(graphene.Mutation):
+    class Arguments:
+        # The input arguments for this mutation
+        id = graphene.ID()
+
+    # The class attributes define the response of the mutation
+    deleted = graphene.Boolean()
+
+    @classmethod
+    def mutate(cls, root, info, id):
+        deleted = True
+        try:
+            building = Building.objects.get(pk=id)
+            building.delete()
+        except Building.DoesNotExist:
+            deleted = False
+
+        # Notice we return an instance of this mutation
+        return DeleteBuildingMutation(deleted=deleted)
+
+
+# MUTATIONS
+class Mutation(graphene.ObjectType):
+    create_building = CreateBuildingMutation.Field()
+    update_building = UpdateBuildingMutation.Field()
+    delete_building = DeleteBuildingMutation.Field()

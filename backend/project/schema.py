@@ -12,7 +12,7 @@ class Query(history_event_schema.Query, asset_schema.Query, team_schema.Query, s
     pass
 
 
-class Mutation(organization_schema.Mutation, graphene.ObjectType):
+class Mutation(location_schema.Mutation, organization_schema.Mutation, graphene.ObjectType):
     pass
 
 
