@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from ..team.models import Team
 # Create your models here.
 
 
@@ -9,7 +10,8 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
         primary_key=True,
     )
-    # team = models.ForeignKey(
-
-    #     on_delete=models.SET_NULL,
-    # )
+    team = models.ForeignKey(
+        Team,
+        on_delete=models.SET_NULL,
+        null=True
+    )

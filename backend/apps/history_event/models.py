@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from apps.asset.models import Asset
 # Create your models here.
 
 
@@ -9,10 +10,10 @@ class HistoryEvent(models.Model):
         on_delete=models.SET_NULL,
         null=True
     )
-    # asset = models.ForeignKey(
-    #     settings.AUTH_ASSET_MODEL,
-    #     on_delete=models.CASCADE,
-    # )
+    asset = models.ForeignKey(
+        Asset,
+        on_delete=models.CASCADE,
+    )
     start_date = models.DateTimeField()  # DateTimeField
     end_date = models.DateTimeField()
     event_type = models.CharField(max_length=200),
@@ -30,4 +31,4 @@ class HistoryEvent(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return f"asset:{self.asset} user : {self.user} event_type: {self.event_type}"
