@@ -2,6 +2,7 @@ import graphene
 from graphene import Node
 from graphene_django import DjangoObjectType
 from graphene_django.filter import DjangoFilterConnectionField
+from graphql_relay.node.node import from_global_id
 
 from .models import Building
 from .models import Floor
@@ -59,8 +60,8 @@ class Query(graphene.ObjectType):
 class CreateBuildingMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
-        lat = graphene.Decimal(required=True)
-        lng = graphene.Decimal(required=True)
+        lat = graphene.Float(required=True)
+        lng = graphene.Float(required=True)
         address = graphene.String(required=True)
         name = graphene.String(required=True)
 
@@ -69,7 +70,8 @@ class CreateBuildingMutation(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, lat, lng, address, name):
-        building = Building.objects.create(lat=lat, lng=lng, address=address, name=name)
+        building = Building.objects.create(
+            lat=lat, lng=lng, address=address, name=name)
 
         # Notice we return an instance of this mutation
         return CreateBuildingMutation(building=building)
@@ -80,21 +82,26 @@ class UpdateBuildingMutation(graphene.Mutation):
     class Arguments:
         # The input arguments for this mutation
         id = graphene.ID()
-        lat = graphene.Decimal(required=True)
-        lng = graphene.Decimal(required=True)
-        address = graphene.String(required=True)
-        name = graphene.String(required=True)
+        lat = graphene.Float(required=False)
+        lng = graphene.Float(required=False)
+        address = graphene.String(required=False)
+        name = graphene.String(required=False)
 
     # The class attributes define the response of the mutation
     building = graphene.Field(BuildingType)
 
     @classmethod
-    def mutate(cls, root, info, id, lat, lng, address, name):
-        building = Building.objects.get(pk=id)
-        building.lat = lat
-        building.lng = lng
-        building.address = address
-        building.name = name
+    def mutate(cls, root, info, id, lat=None, lng=None, address=None, name=None):
+        node_type, pk = from_global_id(id)
+        building = Building.objects.get(pk=pk)
+        if lat is not None:
+            building.lat = lat
+        if lng is not None:
+            building.lng = lng
+        if address is not None:
+            building.address = address
+        if name is not None:
+            building.name = name
         building.save()
 
         # Notice we return an instance of this mutation
@@ -114,7 +121,8 @@ class DeleteBuildingMutation(graphene.Mutation):
     def mutate(cls, root, info, id):
         deleted = True
         try:
-            building = Building.objects.get(pk=id)
+            node_type, pk = from_global_id(id)
+            building = Building.objects.get(pk=pk)
             building.delete()
         except Building.DoesNotExist:
             deleted = False
@@ -137,7 +145,8 @@ class CreateFloorMutation(graphene.Mutation):
 
     @classmethod
     def mutate(cls, root, info, name, number, batiment_id):
-        floor = Floor.objects.create(name=name, number=number, batiment_id=batiment_id)
+        floor = Floor.objects.create(
+            name=name, number=number, batiment_id=batiment_id)
 
         # Notice we return an instance of this mutation
         return CreateFloorMutation(floor=floor)
